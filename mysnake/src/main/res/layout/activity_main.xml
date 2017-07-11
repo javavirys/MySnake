@@ -6,6 +6,12 @@
     android:layout_height="match_parent"
     tools:context="ru.srcblog.litesoftteam.mysnake.MainActivity">
 
+    <include
+        layout="@layout/layout_actionbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/include"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -13,7 +19,7 @@
         android:layout_alignParentStart="true"
         android:orientation="horizontal"
         android:weightSum="1"
-        android:layout_above="@+id/button_left">
+        android:layout_below="@+id/include">
 
         <ru.srcblog.litesoftteam.mysnake.MainCanvas
             android:id="@+id/canvas"
@@ -36,7 +42,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/live_name"
                 android:text="Score:"
-                />
+                android:textSize="@dimen/text_size"/>
 
             <TextView
                 android:id="@+id/title_name"
@@ -44,7 +50,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:text="Snake"/>
+                android:text="Snake"
+                android:textSize="18sp"/>
 
             <TextView
                 android:id="@+id/live_name"
@@ -53,29 +60,10 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/title_name"
-                android:text="Live:"/>
+                android:text="Live:"
+                android:textSize="@dimen/text_size"/>
 
         </RelativeLayout>
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/button_left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/button_left_up"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"/>
-
-    <ImageView
-        android:id="@+id/button_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:src="@mipmap/button_right_up"/>
 
 </RelativeLayout>

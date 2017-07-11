@@ -91,9 +91,48 @@ public class Snake {
 
     public void setMove(int direction)
     {
+        if(direction == move || (direction == Part.MOVE_LEFT && move == Part.MOVE_RIGHT) ||
+                (direction == Part.MOVE_RIGHT && move == Part.MOVE_LEFT) )
+            return;
+
         move = direction;
     }
 
+    public void setMoveLeft()
+    {
+        switch (move){
+            case Part.MOVE_RIGHT:
+                move =  Part.MOVE_UP;
+                break;
+            case Part.MOVE_DOWN:
+                move = Part.MOVE_RIGHT;
+                break;
+            case Part.MOVE_LEFT:
+                move = Part.MOVE_DOWN;
+                break;
+            case Part.MOVE_UP:
+                move = Part.MOVE_LEFT;
+                break;
+        }
+    }
+
+    public void setMoveRight()
+    {
+        switch (move){
+            case Part.MOVE_RIGHT:
+                move =  Part.MOVE_DOWN;
+                break;
+            case Part.MOVE_DOWN:
+                move = Part.MOVE_LEFT;
+                break;
+            case Part.MOVE_LEFT:
+                move = Part.MOVE_UP;
+                break;
+            case Part.MOVE_UP:
+                move = Part.MOVE_RIGHT;
+                break;
+        }
+    }
 
     public int getBlockXIndex(int x)
     {

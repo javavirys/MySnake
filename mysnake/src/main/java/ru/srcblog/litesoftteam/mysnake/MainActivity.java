@@ -19,6 +19,7 @@ package ru.srcblog.litesoftteam.mysnake;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -38,22 +39,39 @@ public class MainActivity extends Activity {
         main = this;
         setContentView(R.layout.activity_main);
 
+        Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/karate.ttf");
+
+        /*
+            * Задать шрифт
+         */
+
+        TextView tvScore = findViewById(R.id.score_name);
+        TextView tvLives = findViewById(R.id.live_name);
+
+        ((TextView) findViewById(R.id.actionbar_title)).setTypeface(tf);
+        tvScore.setTypeface(tf);
+        tvLives.setTypeface(tf);
+        ((TextView) findViewById(R.id.title_name)).setTypeface(tf);
+
         final MainCanvas canvas = findViewById(R.id.canvas);
+
+        tvScore.setText("Scores: 0");
 
         Intent iMsg = getIntent();
         if(iMsg != null) {
             canvas.setHigh(iMsg.getIntExtra(INTENT_MSG_DIFFICULTY, 0));
         }
         canvas.setLives(3);
+        tvLives.setText("Lives: " + canvas.getLives());
         canvas.setDataListener(new DataListener() {
             @Override
             public void onScoresChanged(int scores) {
-                ((TextView) findViewById(R.id.score_name)).setText("Score:" + scores);
+                ((TextView) findViewById(R.id.score_name)).setText("Scores:" + scores);
             }
 
             @Override
             public void onLivesChanged(int lives) {
-                ((TextView) findViewById(R.id.live_name)).setText("Live:" + lives);
+                ((TextView) findViewById(R.id.live_name)).setText("Lives:" + lives);
                 if(lives <= 0) {
                     canvas.stop();
 
@@ -76,60 +94,6 @@ public class MainActivity extends Activity {
 
                     d.show();
                 }
-            }
-        });
-
-        ((TextView) findViewById(R.id.live_name)).setText("Live:" + canvas.getLives());
-        ((TextView) findViewById(R.id.score_name)).setText("Live:" + canvas.getScore());
-
-
-        findViewById(R.id.button_right).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MainCanvas canvas = findViewById(R.id.canvas);
-
-                int move = canvas.snake.getMove();
-
-                switch (move){
-                    case Part.MOVE_RIGHT:
-                        move =  Part.MOVE_DOWN;
-                        break;
-                    case Part.MOVE_DOWN:
-                        move = Part.MOVE_LEFT;
-                        break;
-                    case Part.MOVE_LEFT:
-                        move = Part.MOVE_UP;
-                        break;
-                    case Part.MOVE_UP:
-                        move = Part.MOVE_RIGHT;
-                        break;
-                }
-                canvas.snake.setMove(move);
-            }
-        });
-
-        findViewById(R.id.button_left).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MainCanvas canvas = findViewById(R.id.canvas);
-
-                int move = canvas.snake.getMove();
-
-                switch (move){
-                    case Part.MOVE_RIGHT:
-                        move =  Part.MOVE_UP;
-                        break;
-                    case Part.MOVE_DOWN:
-                        move = Part.MOVE_RIGHT;
-                        break;
-                    case Part.MOVE_LEFT:
-                        move = Part.MOVE_DOWN;
-                        break;
-                    case Part.MOVE_UP:
-                        move = Part.MOVE_LEFT;
-                        break;
-                }
-                canvas.snake.setMove(move);
             }
         });
 

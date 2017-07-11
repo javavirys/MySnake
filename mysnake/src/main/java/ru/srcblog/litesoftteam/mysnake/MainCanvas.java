@@ -22,7 +22,10 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+
+import ru.srcblog.litesoftteam.mysnake.listeners.MotionListener;
 
 /**
  * Created by javavirys on 21.06.2017.
@@ -56,6 +59,8 @@ public class MainCanvas extends View{
 
     int speed;
 
+    MotionListener motionListener;
+
     public MainCanvas(Context context) {
         super(context);
         init();
@@ -79,9 +84,12 @@ public class MainCanvas extends View{
 
         rect = new Rect();
 
+        motionListener = new MotionListener(this);
+
         runnable = new MainRunnable(this);
         mThread = new Thread(runnable);
         mThread.start();
+
     }
 
     public int getRectW()
@@ -92,6 +100,12 @@ public class MainCanvas extends View{
     public int getRectH()
     {
         return rectH;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        return motionListener.onTouch(event);
     }
 
     @Override
@@ -155,17 +169,6 @@ public class MainCanvas extends View{
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // Try for a width based on our minimum
-
-
-        /*int minW = getPaddingLeft() + getPaddingRight() + getSuggestedMinimumWidth();
-
-        int w = Math.max(minW, MeasureSpec.getSize(widthMeasureSpec));
-
-
-        // Whatever the width ends up being, ask for a height that would let the pie
-        // get as big as it can
-        int minH = w  + getPaddingBottom() + getPaddingTop();
-        int h = Math.min(MeasureSpec.getSize(heightMeasureSpec), minH);*/
 
         int w = measureWidth(widthMeasureSpec);
         int h = measureHeight(heightMeasureSpec);

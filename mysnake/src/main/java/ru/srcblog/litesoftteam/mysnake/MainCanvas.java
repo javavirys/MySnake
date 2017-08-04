@@ -17,6 +17,8 @@
 package ru.srcblog.litesoftteam.mysnake;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -35,16 +37,23 @@ public class MainCanvas extends View{
 
     public static String LOG_NAME = "MY_SNAKE";
 
+    Bitmap bmpsBody[] = { Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+            R.drawable.snake_body), rectW,rectH,true) };
+    Bitmap bmpsHead[] = { Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+            R.drawable.snake_head_center), rectW,rectH,true) };
+
+
     DataListener dListener;
 
     private Paint paint;
 
     private Rect rect;
 
-    final int PART_COUNT = 36;
+    int PARTS_COUNTW;
+    int PARTS_COUNTH;
 
-    int rectW;
-    int rectH;
+    static final int rectW = 25;
+    static final int rectH = 25;
 
     Thread mThread;
 
@@ -76,7 +85,6 @@ public class MainCanvas extends View{
         Log.d(LOG_NAME,"init");
 
         speed = 0;
-
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5.0f);
@@ -111,18 +119,29 @@ public class MainCanvas extends View{
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
         // Меняем размеры всех зависящих переменных
-        rectW = w / PART_COUNT;
-        rectH = h / PART_COUNT;
 
-        snake = new Snake(w,h,PART_COUNT);
+        PARTS_COUNTW = w / rectW;
+        PARTS_COUNTH = h / rectH;
 
-        for(int i = 0; i < 5; i++)
-            snake.addPart(new Part(i,0,rectW,rectH,PART_COUNT));
-            //snake.addPart(new Part(i * rectW,0,rectW,rectH));
+        snake = new Snake(getContext(),w,h,PARTS_COUNTW,PARTS_COUNTH);
+        snake.setColored(true);
 
-        heart = new Heart(rectW,rectH,PART_COUNT);
+        int k = 0;
+        for(int i = 0; i < 3; i++) {
+            Part p = new Part(i, 0, rectW, rectH, bmpsBody,Part.MOVE_RIGHT);
+            snake.addPart(p);
+            k = i;
+        }
+
+
+        // Head
+        Part head = new Part(++k,0,rectW,rectH,
+                bmpsHead);
+
+        snake.addPart(head);
+
+        heart = new Heart(rectW,rectH,PARTS_COUNTW,PARTS_COUNTH);
 
         Log.d(LOG_NAME,"onSizeChanged");
     }
@@ -151,7 +170,7 @@ public class MainCanvas extends View{
         int specMode = MeasureSpec.getMode(measureSpec);
         int specSize = MeasureSpec.getSize(measureSpec);
         // Размер по умолчанию, если ограничения не были установлены.
-        int result = 200;
+        int result = 250;
         if (specMode == MeasureSpec.AT_MOST) {
             // Рассчитайте идеальный размер вашего
             // элемента в рамках максимальных значений.
@@ -179,14 +198,21 @@ public class MainCanvas extends View{
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawARGB(255,100,255,255);
+
+        //canvas.drawARGB(255,100,255,255);
+
+        //canvas.drawBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.playing_field),0f,0f,null);
 
         /*
             Рисуем сетку
          */
 
-        for(int i = 0; i < PART_COUNT; i++)
-            for(int j = 0; j < PART_COUNT; j++){
+        //RectF r = new RectF(0,0,getWidth(),getHeight());
+
+        //canvas.drawRoundRect(r,20,20,paint);
+
+        for(int i = 0; i < PARTS_COUNTW; i++)
+            for(int j = 0; j < PARTS_COUNTH;     j++){
                 rect.set(i * rectW,j * rectH,rectW + (rectW * i),rectH + (rectH * j));
                 canvas.drawRect(rect, paint);
             }

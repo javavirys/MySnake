@@ -16,7 +16,6 @@
 
 package ru.srcblog.litesoftteam.mysnake.listeners;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import ru.srcblog.litesoftteam.mysnake.MainCanvas;
@@ -49,22 +48,16 @@ public class MotionListener{
 
         if(action == MotionEvent.ACTION_DOWN)
         {
-            Log.d("TEST","DOWN");
             startX = motionEvent.getX();
             startY = motionEvent.getY();
         }
 
         if(action == MotionEvent.ACTION_UP)
         {
-            Log.d("TEST","UP");
             endX = motionEvent.getX();
             endY = motionEvent.getY();
 
-            Log.d("TEST","startX: " + startX);
-            Log.d("TEST","endX: " + endX);
-
             int move = context.snake.getMove();
-
             if(move == Part.MOVE_UP) {
                 if (endX - startX > SWIPE_MIN_DISTANCE) {
                     context.snake.setMoveRight();
@@ -93,6 +86,7 @@ public class MotionListener{
                     context.snake.setMoveRight();
                 }
             }
+            context.snake.move();
         }
         return true;
     }

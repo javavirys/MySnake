@@ -16,6 +16,11 @@
 
 package ru.srcblog.litesoftteam.mysnake;
 
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.Formatter;
 
 /**
@@ -24,40 +29,101 @@ import java.util.Formatter;
 
 public class Part {
 
+    public static final int TRANS_NONE          = 10;
+    public static final int TRANS_ROT90         = 11;
+    public static final int TRANS_ROT180        = 12;
+    public static final int TRANS_ROT270        = 13;
+    public static final int TRANS_MIRROR        = 14;
+    public static final int TRANS_MIRROR_ROT90  = 15;
+    public static final int TRANS_MIRROR_ROT180 = 16;
+    public static final int TRANS_MIRROR_ROT270 = 17;
+
     public static final int MOVE_UP = 2;
     public static final int MOVE_DOWN = 8;
     public static final int MOVE_LEFT = 4;
     public static final int MOVE_RIGHT = 6;
 
+    /*
+        Координаты квадрата в пикселях
+     */
     int x;
     int y;
     int w;
     int h;
 
-
+    /*
+        Координаты квадрата на сетке
+     */
     int xBlock;
     int yBlock;
     int wBlock;
     int hBlock;
 
-    public Part()
-    {
-        this(0,0,0,0,0);
-    }
+    /*
+        Индекс frame
+     */
+    int frameIndex;
+    int defaultFrame;
 
-    public Part(int xBlock,int yBlock,int wBlock,int hBlock,int BlockCount)
+    ArrayList<Bitmap> frames;
+
+    Matrix matrix;
+
+    int transform;
+
+    int direction; // Дополн. переменная чтобы знать куда движемся
+
+    public Part(int xBlock, int yBlock, int wBlock, int hBlock, Bitmap bitmaps[],int direction)
     {
         this.xBlock = xBlock;
         this.yBlock = yBlock;
         this.wBlock = wBlock;
         this.hBlock = hBlock;
+
+        frames = new ArrayList<>();
+
+        if (bitmaps != null) {
+            for (Bitmap bitmap : bitmaps)
+                frames.add(bitmap);
+        }
+
+        defaultFrame = 0;
+        frameIndex = 0;
+
+        matrix = new Matrix();
+
+        this.direction = direction;
+    }
+
+    public Part(int xBlock, int yBlock, int wBlock, int hBlock, Bitmap bitmaps[])
+    {
+        this(xBlock,yBlock,wBlock,hBlock,bitmaps,MOVE_RIGHT);
     }
 
     public Part(Part part)
     {
-        //this(part.getX(),part.getY(),part.getW(),part.getH());
-        this(part.getXBlock(),part.getYBlock(),part.getWBlock(),part.getHBlock(),0);
+        this(part.getXBlock(),part.getYBlock(),part.getWBlock(),part.getHBlock(),
+                part.getBitmaps());
+        setDirection(part.getDirection());
     }
+
+    public Part(int xBlock, int yBlock, int wBlock, int hBlock, ArrayList<Bitmap> bitmaps)
+    {
+        this(xBlock,yBlock,wBlock,hBlock,null,MOVE_RIGHT);
+        setBitmaps(bitmaps);
+    }
+
+    public Part()
+    {
+        this(0,0,0,0,null,MOVE_RIGHT);
+    }
+
+
+    public int getFrame() {
+        return frameIndex;
+    }
+
+    public int getDefaultFrame() { return defaultFrame; }
 
     public int getXBlock()
     {
@@ -79,6 +145,28 @@ public class Part {
         return hBlock;
     }
 
+
+    /**
+     *
+     * @return Список bitmaps
+     */
+    public ArrayList<Bitmap> getBitmaps() {
+        return frames;
+    }
+
+
+    /**
+     * Получить выбранную картинку
+     * @return Текущая bitmap
+     * @see #setFrame(int)
+     * @see #getFrame()
+     */
+    public Bitmap getBmp()
+    {
+        Bitmap bmp = frames.get(frameIndex);
+        bmp = Bitmap.createBitmap(bmp,0,0,bmp.getWidth(),bmp.getHeight(),matrix,true);
+        return bmp;
+    }
 
     public int getX()
     {
@@ -120,7 +208,86 @@ public class Part {
         this.h = h;
     }
 
+    public int getTransform()
+    {
+        return transform;
+    }
 
+    public int getDirection()
+    {
+        return direction;
+    }
+
+    public void setTransform(int trans)
+    {
+        Log.d(MainCanvas.LOG_NAME,"setTranform: " + trans);
+        transform = trans;
+        matrix.reset();
+        switch (transform)
+        {
+            case TRANS_NONE:
+                matrix.postRotate(0);
+                break;
+            case TRANS_ROT90:
+                matrix.postRotate(90);
+                break;
+            case TRANS_ROT180:
+                matrix.postRotate(180);
+                break;
+            case TRANS_ROT270:
+                matrix.postRotate(270);
+                break;
+            case TRANS_MIRROR:
+                matrix.postScale(-1,-1);
+                break;
+            case TRANS_MIRROR_ROT90:
+            case TRANS_MIRROR_ROT180:
+            case TRANS_MIRROR_ROT270:
+                matrix.postScale(-1,-1);
+                break;
+        }
+    }
+
+    public void setBitmaps(ArrayList<Bitmap> arr) {
+        frames.clear();
+        frames.addAll(arr);
+    }
+
+    public void setDefaultFrame(int index)
+    {
+        defaultFrame = index;
+    }
+
+    public void setFrame(int index)
+    {
+        frameIndex = index;
+    }
+
+    public void setDirection(int dir)
+    {
+        direction = dir;
+        switch (direction)
+        {
+            case MOVE_RIGHT:
+                setTransform(TRANS_NONE);
+                break;
+            case MOVE_DOWN:
+                setTransform(TRANS_ROT90);
+                break;
+            case MOVE_LEFT:
+                setTransform(TRANS_ROT180);
+                break;
+            case MOVE_UP:
+                setTransform(TRANS_ROT270);
+                break;
+        }
+
+    }
+
+    public void resetTransformBmp()
+    {
+        frameIndex = defaultFrame;
+    }
 
     @Override
     public String toString()

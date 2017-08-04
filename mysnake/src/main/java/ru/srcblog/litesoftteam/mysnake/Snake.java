@@ -16,8 +16,11 @@
 
 package ru.srcblog.litesoftteam.mysnake;
 
+import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -27,31 +30,52 @@ import java.util.ArrayList;
 
 public class Snake {
 
+    Context context;
+
     private ArrayList<Part> parts;
 
-    private int move;
 
     Paint paint;
 
     int w;
     int h;
-    int countBlocks;
+
+    int countBlocksW;
+    int countBlocksH;
 
     boolean isVisible;
 
-    public Snake(int w,int h,int countBlock)
+    boolean isColored;
+
+    Matrix matrix;
+
+    ArrayList<Turn> turnsList;
+
+    int animateAdd = 1;
+
+    public Snake(Context c,int w,int h,int countBlockW,int countBlockH)
     {
+        context = c;
         this.w = w;
         this.h = h;
-        this.countBlocks = countBlock;
+        this.countBlocksW = countBlockW;
+        this.countBlocksH = countBlockH;
+        isColored = false;
 
         parts = new ArrayList<>();
-        move = Part.MOVE_RIGHT;
+        turnsList = new ArrayList<>();
 
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(0xff000000);
+
+        isColored = false;
+
         isVisible = true;
+
+        matrix = new Matrix();
+
+
     }
 
     public void addPart(Part p)
@@ -86,23 +110,26 @@ public class Snake {
 
     public int getMove()
     {
-        return move;
+        return getHead().getDirection();
     }
 
     public void setMove(int direction)
     {
-        if(direction == move || (direction == Part.MOVE_LEFT && move == Part.MOVE_RIGHT) ||
-                (direction == Part.MOVE_RIGHT && move == Part.MOVE_LEFT) )
-            return;
 
-        move = direction;
+        if(direction == getMove() || (direction == Part.MOVE_LEFT && getMove() == Part.MOVE_RIGHT) ||
+                (direction == Part.MOVE_RIGHT && getMove() == Part.MOVE_LEFT) )
+            return;
+        Part head = getHead();
+        head.setDirection(direction);
     }
 
     public void setMoveLeft()
     {
-        switch (move){
+        Part p = getHead();
+        int move = 0;
+        switch (p.getDirection()) {
             case Part.MOVE_RIGHT:
-                move =  Part.MOVE_UP;
+                move = Part.MOVE_UP;
                 break;
             case Part.MOVE_DOWN:
                 move = Part.MOVE_RIGHT;
@@ -114,13 +141,23 @@ public class Snake {
                 move = Part.MOVE_LEFT;
                 break;
         }
+        p.setDirection(move);
+
+        Turn t = new Turn();
+        t.x = p.getXBlock();
+        t.y = p.getYBlock();
+        t.direction = p.getDirection();
+        turnsList.add(t);
     }
 
     public void setMoveRight()
     {
-        switch (move){
+        Part p = getHead();
+
+        int move = 0;
+        switch (p.getDirection()) {
             case Part.MOVE_RIGHT:
-                move =  Part.MOVE_DOWN;
+                move = Part.MOVE_DOWN;
                 break;
             case Part.MOVE_DOWN:
                 move = Part.MOVE_LEFT;
@@ -132,18 +169,22 @@ public class Snake {
                 move = Part.MOVE_RIGHT;
                 break;
         }
+        p.setDirection(move);
+        Turn t = new Turn();
+        t.x = p.getXBlock();
+        t.y = p.getYBlock();
+        t.direction = p.getDirection();
+        turnsList.add(t);
     }
 
     public int getBlockXIndex(int x)
     {
-
-        return (x * countBlocks) / w;
+        return (x * countBlocksW) / w;
     }
 
     public int getBlockYIndex(int y)
     {
-
-        return (y * countBlocks) / h;
+        return (y * countBlocksH) / h;
     }
 
 
@@ -174,9 +215,7 @@ public class Snake {
     {
         Part tail = parts.get(0);
         if(h.getXBlock() == tail.getXBlock() && h.getYBlock() == tail.getYBlock())
-        {
             return true;
-        }
         return false;
     }
 
@@ -190,29 +229,38 @@ public class Snake {
         isVisible = visible;
     }
 
+    public void setColored(boolean colored) {
+        isColored = colored;
+    }
+
     /*
         Движение змейки
         нужно розобраться, как поворачивать
      */
+
     public void move()
     {
         Part head = parts.get(parts.size() - 1);
 
         Part oldPart = null;
 
-        if(move == Part.MOVE_RIGHT)
+        /*
+            Сдвигаем голову по направлению на один куб
+         */
+        if(head.getDirection() == Part.MOVE_RIGHT)
         {
             oldPart = new Part(head);
             head.xBlock ++;
-        } else if(move == Part.MOVE_DOWN)
+
+        } else if(head.getDirection() == Part.MOVE_DOWN)
         {
             oldPart = new Part(head);
             head.yBlock ++;
-        } else if(move == Part.MOVE_LEFT)
+        } else if(head.getDirection() == Part.MOVE_LEFT)
         {
             oldPart = new Part(head);
             head.xBlock --;
-        } else if(move == Part.MOVE_UP)
+        } else if(head.getDirection() == Part.MOVE_UP)
         {
             oldPart = new Part(head);
             head.yBlock --;
@@ -221,23 +269,111 @@ public class Snake {
         if(oldPart == null)
             return;
 
+        // Обьявляем переменные для сохранения направления и координат квадратиков змейки
         int xBlock;
         int yBlock;
+        int move;
 
-
+        // Запускаем цикл в котором каждый квадратик принимает
+        // старые координаты предыдущего квадратика
         for(int i = parts.size() - 2; i > -1; i--) {
             Part p = parts.get(i);
+            // animate
+            /*switch(p.animate)
+            {
+                case 0:
+                case 2:
+                case 4:
+                    Bitmap temp = BitmapFactory.decodeResource(context.getResources(),
+                            R.drawable.snake_body_1);
+                    temp = Bitmap.createScaledBitmap(temp,p.wBlock,p.hBlock,true);
+                    p.setDefaultBmp(temp);
+                    p.setBmp(temp);
+                    break;
+                case 1:
+                case 5:
+                case 6:
+                    temp = BitmapFactory.decodeResource(context.getResources(),
+                            R.drawable.snake_body);
+                    temp = Bitmap.createScaledBitmap(temp,p.wBlock,p.hBlock,true);
+                    p.setDefaultBmp(temp);
+                    p.setBmp(temp);
+                    break;
+                case 3:
+                    temp = BitmapFactory.decodeResource(context.getResources(),
+                            R.drawable.snake_body);
+                    temp = Bitmap.createScaledBitmap(temp,p.wBlock,p.hBlock,true);
+                    p.setDefaultBmp(temp);
+                    matrix = new Matrix();
+                    matrix.postScale(-1,1);
+                    temp = Bitmap.createBitmap(temp,0,0,temp.getWidth(),temp.getHeight(),matrix,true);
+                    p.setBmp(temp);
+                    break;
+            }
+
+            p.animate += animateAdd;
+            if(p.animate > 6) {
+                p.animate = 6;
+                animateAdd = -1;
+            }else if(p.animate < 0)
+            {
+                p.animate = 0;
+                animateAdd = 1;
+            }*/
+            // end of animate
 
             xBlock = p.xBlock;
             yBlock = p.yBlock;
-
+            move = p.getDirection();
 
             p.xBlock = oldPart.xBlock;
             p.yBlock = oldPart.yBlock;
+            p.setDirection(oldPart.getDirection()); //
 
-            oldPart = new Part();
+            // ***************** Поворот ***************** \\
+            if(p.getDirection() != move)
+            {
+                //Log.d(MainCanvas.LOG_NAME,"Direction is changed");
+                //Log.d(MainCanvas.LOG_NAME,"turn count:" + turnsList.size());
+                for(int j = 0; j < turnsList.size(); j ++)
+                {
+                    Turn t = turnsList.get(j);
+
+                    if(t.x == p.getXBlock() && t.y == p.getYBlock())
+                    {
+                        Log.d(MainCanvas.LOG_NAME,"turn: getDirection: " + p.getDirection() + " move:" + move);
+                        /*Bitmap b = BitmapFactory.decodeResource(context.getResources(),R.drawable.snake_turn);
+                        matrix = new Matrix();
+                        switch(move)
+                        {
+                            case Part.MOVE_RIGHT:
+                                if(p.getDirection() == Part.MOVE_UP)
+                                    matrix.postScale(1,-1);
+                                break;
+                            case Part.MOVE_LEFT:
+                                if(p.getDirection() == Part.MOVE_DOWN) {
+                                    matrix.postScale(1, -1);
+                                    matrix.postRotate(180);
+                                }
+                                break;
+                        }
+                        b = Bitmap.createBitmap(b,0,0,b.getWidth(),b.getHeight(),matrix,true);
+                        p.setBmp(Bitmap.createScaledBitmap(b,p.getWBlock(),p.getHBlock(),true));*/
+                        if(i == 0)
+                        {
+                            //Log.d(MainCanvas.LOG_NAME,"hvost");
+                            if(turnsList.size() > 0)
+                                turnsList.remove(0);
+                        }
+                    }
+                }
+            }
+            // ***************** Конец поворота ***************** \\
+
+            oldPart = new Part(p);
             oldPart.xBlock = xBlock;
             oldPart.yBlock = yBlock;
+            oldPart.setDirection(move);
         }
     }
 
@@ -245,10 +381,22 @@ public class Snake {
     {
         for(int i = 0; i < getPartCount(); i++) {
             Part p = getPart(i);
-            canvas.drawRect(p.xBlock * p.wBlock,p.yBlock * p.hBlock,p.xBlock * p.wBlock + p.wBlock,p.yBlock * p.hBlock + p.hBlock,
-                    paint);
+            if(isColored && p.getBmp() != null)
+            {
+                canvas.drawBitmap(p.getBmp(),p.xBlock * p.wBlock,
+                        p.yBlock * p.hBlock,paint);
+            }
+            else
+                canvas.drawRect(p.xBlock * p.wBlock, p.yBlock * p.hBlock,
+                        p.xBlock * p.wBlock + p.wBlock, p.yBlock * p.hBlock + p.hBlock,
+                            paint);
         }
-
     }
+}
 
+class Turn
+{
+    int x;
+    int y;
+    int direction;
 }

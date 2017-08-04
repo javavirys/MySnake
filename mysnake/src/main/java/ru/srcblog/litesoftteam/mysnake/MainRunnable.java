@@ -32,8 +32,6 @@ public class MainRunnable implements Runnable {
 
     private boolean gameOver;
 
-    boolean menuFlag;
-
     public MainRunnable(MainCanvas main)
     {
         this.main = main;
@@ -65,8 +63,8 @@ public class MainRunnable implements Runnable {
                 main.heart.generate();
             }
 
-            if(!gameOver)
-                main.snake.move();
+            /*if(!gameOver)
+                main.snake.move();*/
 
             /*
                 Столкновение с серцем
@@ -76,8 +74,11 @@ public class MainRunnable implements Runnable {
                 Log.d(MainCanvas.LOG_NAME,"checkCollision");
                 main.heart.generateCoord();
 
-                main.snake.insertPart(0,new Part(main.snake.getPart(0).getXBlock(),main.snake.getPart(0).getYBlock(),
-                        main.snake.getPart(0).getWBlock(),main.snake.getPart(0).getHBlock(),main.PART_COUNT));
+                Part p = new Part(main.snake.getPart(0).getXBlock(),main.snake.getPart(0).getYBlock(),
+                        main.snake.getPart(0).getWBlock(),main.snake.getPart(0).getHBlock(),
+                        main.bmpsBody);
+
+                main.snake.insertPart(0,p);
 
                 if(main.dListener != null)
                     main.post(new Runnable() {
@@ -89,10 +90,8 @@ public class MainRunnable implements Runnable {
                     });
             }
 
-            Part head = main.snake.getHead();
-
-            if(!gameOver && (main.snake.checkCollision(main.PART_COUNT,true) ||
-                    main.snake.checkCollision(main.PART_COUNT,false) ||
+            /*if(!gameOver && (main.snake.checkCollision(main.PARTS_COUNTW,true) ||
+                    main.snake.checkCollision(main.PARTS_COUNTH,false) ||
                     main.snake.checkCollision(-1,true) ||
                     main.snake.checkCollision(-1,false) ||
                     checkSelfCollision()))
@@ -110,7 +109,7 @@ public class MainRunnable implements Runnable {
                 if(main.lives < 1) {
                     gameOver = true;
                 }
-            }
+            }*/
 
 
             main.post(new Runnable() {

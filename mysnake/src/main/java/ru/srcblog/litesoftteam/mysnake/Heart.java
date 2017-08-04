@@ -38,16 +38,18 @@ public class Heart {
     int wBlock;
     int hBlock;
 
-    int bCount;
+    int bWCount;
+    int bHCount;
 
     Paint paint;
 
 
-    public Heart(int wBlock,int hBlock,int blockCount)
+    public Heart(int wBlock,int hBlock,int blockWCount,int blockHCount)
     {
         this.wBlock = wBlock;
         this.hBlock = hBlock;
-        this.bCount = blockCount;
+        this.bWCount = blockWCount;
+        this.bHCount = blockHCount;
 
         flagGen = false;
 
@@ -59,8 +61,8 @@ public class Heart {
 
     public void generate() {
         Random rnd = new Random();
-        xBlock = Math.abs(rnd.nextInt() % bCount);
-        yBlock = Math.abs(rnd.nextInt() % bCount);
+        xBlock = Math.abs(rnd.nextInt() % bWCount);
+        yBlock = Math.abs(rnd.nextInt() % bHCount);
         flagGen = true;
     }
 

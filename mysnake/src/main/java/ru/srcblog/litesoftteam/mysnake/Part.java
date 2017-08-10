@@ -18,7 +18,6 @@ package ru.srcblog.litesoftteam.mysnake;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -42,6 +41,9 @@ public class Part {
     public static final int MOVE_DOWN = 8;
     public static final int MOVE_LEFT = 4;
     public static final int MOVE_RIGHT = 6;
+
+
+    private boolean isVisible;
 
     /*
         Координаты квадрата в пикселях
@@ -73,8 +75,16 @@ public class Part {
 
     int direction; // Дополн. переменная чтобы знать куда движемся
 
+    int frameAdd = 1;
+
+    int frameSequence[]; // последовательность отображения
+    int sequenceIndex = 0;
+
+    Bitmap swapBmp = null;
+
     public Part(int xBlock, int yBlock, int wBlock, int hBlock, Bitmap bitmaps[],int direction)
     {
+        isVisible = true;
         this.xBlock = xBlock;
         this.yBlock = yBlock;
         this.wBlock = wBlock;
@@ -93,6 +103,8 @@ public class Part {
         matrix = new Matrix();
 
         this.direction = direction;
+
+        frameSequence = null;
     }
 
     public Part(int xBlock, int yBlock, int wBlock, int hBlock, Bitmap bitmaps[])
@@ -118,6 +130,10 @@ public class Part {
         this(0,0,0,0,null,MOVE_RIGHT);
     }
 
+
+    public boolean isVisible() {
+        return isVisible;
+    }
 
     public int getFrame() {
         return frameIndex;
@@ -163,6 +179,10 @@ public class Part {
      */
     public Bitmap getBmp()
     {
+        if(swapBmp != null)
+        {
+            return swapBmp;
+        }
         Bitmap bmp = frames.get(frameIndex);
         bmp = Bitmap.createBitmap(bmp,0,0,bmp.getWidth(),bmp.getHeight(),matrix,true);
         return bmp;
@@ -186,6 +206,15 @@ public class Part {
     public int getH()
     {
         return h;
+    }
+
+    public int getFramesCount()
+    {
+        return frames.size();
+    }
+
+    public Bitmap getSwapBmp() {
+        return swapBmp;
     }
 
     public void setX(int x)
@@ -220,7 +249,7 @@ public class Part {
 
     public void setTransform(int trans)
     {
-        Log.d(MainCanvas.LOG_NAME,"setTranform: " + trans);
+        //Log.d(MainCanvas.LOG_NAME,"setTranform: " + trans);
         transform = trans;
         matrix.reset();
         switch (transform)
@@ -284,9 +313,52 @@ public class Part {
 
     }
 
-    public void resetTransformBmp()
+    public void setFrameSequence(int sequence[])
     {
+        frameSequence = sequence;
+    }
+
+    public void setVisible(boolean flag)
+    {
+        isVisible = flag;
+    }
+
+    /**
+     * Меняем текстуру на заданую
+     * @param bmp - текстура, если null то все возвращается
+     */
+    public void setSwapBmp(Bitmap bmp)
+    {
+        swapBmp = bmp;
+    }
+
+    public void resetTransformBmp() {
         frameIndex = defaultFrame;
+    }
+
+    public void nextFrame()
+    {
+        int index = 0;
+        if(frameSequence == null) {
+            index = getFrame();
+
+            index += frameAdd;
+            if (index > getFramesCount() - 1) {
+                index = 0;
+            }
+            setFrame(index);
+        } else
+        {
+            index = nextSequence();
+
+        }
+        setFrame(index);
+    }
+
+    private int nextSequence()
+    {
+        return frameSequence[sequenceIndex >= frameSequence.length ?
+                sequenceIndex = 0 : sequenceIndex ++];
     }
 
     @Override

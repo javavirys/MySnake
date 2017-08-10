@@ -63,8 +63,8 @@ public class MainRunnable implements Runnable {
                 main.heart.generate();
             }
 
-            /*if(!gameOver)
-                main.snake.move();*/
+            //if(!gameOver)
+                //main.snake.move();
 
             /*
                 Столкновение с серцем
@@ -78,7 +78,7 @@ public class MainRunnable implements Runnable {
                         main.snake.getPart(0).getWBlock(),main.snake.getPart(0).getHBlock(),
                         main.bmpsBody);
 
-                main.snake.insertPart(0,p);
+                main.snake.insertPart(1,p);
 
                 if(main.dListener != null)
                     main.post(new Runnable() {

@@ -38,9 +38,33 @@ public class MainCanvas extends View{
     public static String LOG_NAME = "MY_SNAKE";
 
     Bitmap bmpsBody[] = { Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-            R.drawable.snake_body), rectW,rectH,true) };
+            R.drawable.snake_body_1), rectW,rectH,true),
+            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.snake_body_2), rectW,rectH,true),
+            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.snake_body_3), rectW,rectH,true),
+            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.snake_body_4), rectW,rectH,true),
+            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.snake_body_5), rectW,rectH,true),
+            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.snake_body_6), rectW,rectH,true)};
+
     Bitmap bmpsHead[] = { Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-            R.drawable.snake_head_center), rectW,rectH,true) };
+            R.drawable.snake_head_1), rectW,rectH,true),
+            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.snake_head_2), rectW,rectH,true),
+            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.snake_head_3), rectW,rectH,true)};
+
+    Bitmap bmpsTail[] = { Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+            R.drawable.snake_tail_1), rectW,rectH,true),
+            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.snake_tail_2), rectW,rectH,true),
+            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.snake_tail_4), rectW,rectH,true),
+            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.snake_tail_5), rectW,rectH,true)};
 
 
     DataListener dListener;
@@ -127,9 +151,16 @@ public class MainCanvas extends View{
         snake = new Snake(getContext(),w,h,PARTS_COUNTW,PARTS_COUNTH);
         snake.setColored(true);
 
+        Part tail = new Part(0, 0, rectW, rectH, bmpsTail,Part.MOVE_RIGHT);
+        tail.setFrame(1);
+        //int arr[] = {0,1,1,2,3,3};
+        //tail.setFrameSequence(arr);
+        snake.addPart(tail);
+
         int k = 0;
-        for(int i = 0; i < 3; i++) {
+        for(int i = 1; i < 6; i++) {
             Part p = new Part(i, 0, rectW, rectH, bmpsBody,Part.MOVE_RIGHT);
+            p.setFrame(Math.abs(i % 6));
             snake.addPart(p);
             k = i;
         }
@@ -138,7 +169,7 @@ public class MainCanvas extends View{
         // Head
         Part head = new Part(++k,0,rectW,rectH,
                 bmpsHead);
-
+        head.setFrame(1);
         snake.addPart(head);
 
         heart = new Heart(rectW,rectH,PARTS_COUNTW,PARTS_COUNTH);

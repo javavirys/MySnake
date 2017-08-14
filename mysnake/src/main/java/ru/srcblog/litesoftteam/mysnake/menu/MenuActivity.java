@@ -1,4 +1,4 @@
-/**
+/*
  Copyright 2017 javavirys
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 
 import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -74,10 +75,10 @@ public class MenuActivity extends Activity {
             }*/
                                       });
 
-        //AdRequest adRequest = new AdRequest.Builder()//.addTestDevice("8C42340767A25C05F0527E18EC82509B")
-        //        .build();
+        AdRequest adRequest = new AdRequest.Builder()//.addTestDevice("8C42340767A25C05F0527E18EC82509B")
+                .build();
 
-        //mInterstitialAd.loadAd(adRequest);
+        mInterstitialAd.loadAd(adRequest);
 
         ImageView menu = findViewById(R.id.menu_view);
         menu.setOnTouchListener(new View.OnTouchListener() {

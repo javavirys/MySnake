@@ -1,4 +1,4 @@
-/**
+/*
  Copyright 2017 javavirys
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,18 +22,18 @@ import ru.srcblog.litesoftteam.mysnake.MainCanvas;
 import ru.srcblog.litesoftteam.mysnake.Part;
 
 
-/**
+/*
  * Created by javavirys on 07.07.2017.
  */
 
 public class MotionListener{
 
-    MainCanvas context;
+    private MainCanvas context;
 
-    float startX;
-    float startY;
-    float endX;
-    float endY;
+    private float startX;
+    private float startY;
+    private float endX;
+    private float endY;
 
     private static final int SWIPE_MIN_DISTANCE = 40;
 
@@ -86,7 +86,7 @@ public class MotionListener{
                     context.snake.setMoveRight();
                 }
             }
-            context.snake.move();
+            //context.snake.move();
         }
         return true;
     }

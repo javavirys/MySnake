@@ -20,9 +20,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -39,6 +39,8 @@ public class Snake {
 
     Paint paint;
 
+    int x;
+    int y;
     int w;
     int h;
 
@@ -51,9 +53,11 @@ public class Snake {
 
     ArrayList<Turn> turnsList;
 
-    public Snake(Context c,int w,int h,int countBlockW,int countBlockH)
+    public Snake(Context c,int x,int y,int w,int h,int countBlockW,int countBlockH)
     {
         context = c;
+        this.x = x;
+        this.y = y;
         this.w = w;
         this.h = h;
         this.countBlocksW = countBlockW;
@@ -207,8 +211,8 @@ public class Snake {
 
     public boolean checkCollision(Heart h)
     {
-        Part tail = parts.get(0);
-        if(h.getXBlock() == tail.getXBlock() && h.getYBlock() == tail.getYBlock())
+        Part head = getHead();
+        if(h.getXBlock() == head.getXBlock() && h.getYBlock() == head.getYBlock())
             return true;
         return false;
     }
@@ -273,7 +277,7 @@ public class Snake {
         for(int i = parts.size() - 2; i > -1; i--) {
             Part p = parts.get(i);
             // animate
-            p.nextFrame();
+            //p.nextFrame();
             // end of animate
 
             xBlock = p.xBlock;
@@ -285,6 +289,7 @@ public class Snake {
             p.xBlock = oldPart.xBlock;
             p.yBlock = oldPart.yBlock;
             p.setDirection(oldPart.getDirection()); //
+            p.setVisible(true);
 
             // ***************** Поворот ***************** \\
             if(p.getDirection() != move)
@@ -319,13 +324,14 @@ public class Snake {
                         {
                             Bitmap tmp;
 
-                            Part child = parts.get(i - 1);
-                            //Log.d(MainCanvas.LOG_NAME,"child frame: " + child.getFrame());
-
-                            p.setFrame(5);
-
                             // TODO Подогнать под изгибы
-                            tmp = turnBmp(i,parent,child,move,p.getDirection());
+
+                            tmp = BitmapFactory.decodeResource(
+                                    context.getResources(),
+                                    R.drawable.snake_around);
+
+                            tmp = Bitmap.createScaledBitmap(
+                                    tmp, MainCanvas.rectW, MainCanvas.rectH, true);
 
                             tmp = diformationBmp(tmp,move,p.getDirection());
                             p.setSwapBmp(tmp);
@@ -345,116 +351,7 @@ public class Snake {
             //oldPart.setSwapBmp(swapBmp);// test
         }
 
-        // ******************* animate head ******************* \\
-        animateHead(head);
-        // *************** End of animate head **************** \\
-        animateTail(parts.get(0));
 
-    }
-
-    private Bitmap turnBmp(int index,Part parent,Part child,int oldMove,int newMove)
-    {
-        Bitmap tmp;
-        int bmpId = 0;
-        Log.d(MainCanvas.LOG_NAME,"=============== Enter turnBmp ===============");
-        Log.d(MainCanvas.LOG_NAME,"oldMove: " + oldMove + " newMove: " + newMove);
-        Log.d(MainCanvas.LOG_NAME,"child move: " + child.getDirection());
-
-        if(parent.getSwapBmp() != null){
-            // Лишнее условие для изменения поворота предка
-            Log.d(MainCanvas.LOG_NAME,"parent move: " + parent.getDirection());
-            tmp = BitmapFactory.decodeResource(
-                    context.getResources(),
-                    R.drawable.snake_turn_3);
-            tmp = Bitmap.createScaledBitmap(
-                    tmp, MainCanvas.rectW, MainCanvas.rectH, true);
-            // лишний раз миняем угол
-            // P.S. может когда-то оптимизирую
-            tmp = diformationBmp(tmp,newMove,parent.getDirection());
-            parent.setSwapBmp(tmp);
-        }
-
-        /*if(child.getSwapBmp() != null) {
-            Log.d(MainCanvas.LOG_NAME,"turnBmp().child turned");
-            bmpId = R.drawable.snake_turn_3;
-        }else*/ if(oldMove == Part.MOVE_LEFT && newMove == Part.MOVE_DOWN) {
-            if (child.getFrame() == 0)
-                bmpId = R.drawable.snake_turn_5;
-            else if (child.getFrame() == 1)
-                bmpId = R.drawable.snake_turn_3;
-            else if (child.getFrame() == 2)
-                bmpId = R.drawable.snake_turn_1;
-            else if (child.getFrame() == 3)
-                bmpId = R.drawable.snake_turn_1;
-            else if (child.getFrame() == 4)
-                bmpId = R.drawable.snake_turn_3;
-            else if (child.getFrame() == 5)
-                bmpId = R.drawable.snake_turn_4;
-        }else if(oldMove == Part.MOVE_UP && newMove == Part.MOVE_LEFT) {
-            // Плавнее
-            Log.d(MainCanvas.LOG_NAME,"turn left from up: " + child.getFrame());
-            if (child.getFrame() == 0)
-                bmpId = R.drawable.snake_turn_5;
-            else if (child.getFrame() == 1)
-                bmpId = R.drawable.snake_turn_3;
-            else if (child.getFrame() == 2)
-                bmpId = R.drawable.snake_turn_1;
-            else if (child.getFrame() == 3)
-                bmpId = R.drawable.snake_turn_2;
-            else if (child.getFrame() == 4)
-                bmpId = R.drawable.snake_turn_4;
-            else if (child.getFrame() == 5)
-                bmpId = R.drawable.snake_turn_5;
-        } else if(oldMove == Part.MOVE_DOWN && newMove == Part.MOVE_RIGHT) {
-            Log.d(MainCanvas.LOG_NAME,"turn right from down: " + child.getFrame());
-            if (child.getFrame() == 0)
-                bmpId = R.drawable.snake_turn_5;
-            else if (child.getFrame() == 1)
-                bmpId = R.drawable.snake_turn_3;
-            else if (child.getFrame() == 2)
-                bmpId = R.drawable.snake_turn_1;
-            else if (child.getFrame() == 3)
-                bmpId = R.drawable.snake_turn_1;
-            else if (child.getFrame() == 4)
-                bmpId = R.drawable.snake_turn_5;
-            else if (child.getFrame() == 5)
-                bmpId = R.drawable.snake_turn_5;
-        } else if(oldMove == Part.MOVE_RIGHT && newMove == Part.MOVE_UP) {
-            if (child.getFrame() == 0)
-                bmpId = R.drawable.snake_turn_5;
-            else if (child.getFrame() == 1)
-                bmpId = R.drawable.snake_turn_3;
-            else if (child.getFrame() == 2)
-                bmpId = R.drawable.snake_turn_1;
-            else if (child.getFrame() == 3)
-                bmpId = R.drawable.snake_turn_1;
-            else if (child.getFrame() == 4)
-                bmpId = R.drawable.snake_turn_3;
-            else if (child.getFrame() == 5)
-                bmpId = R.drawable.snake_turn_5;
-        } else {
-            if (child.getFrame() == 0)
-                bmpId = R.drawable.snake_turn_1;
-            else if (child.getFrame() == 1)
-                bmpId = R.drawable.snake_turn_3;
-            else if (child.getFrame() == 2)
-                bmpId = R.drawable.snake_turn_4;
-            else if (child.getFrame() == 3)
-                bmpId = R.drawable.snake_turn_5;
-            else if (child.getFrame() == 4)
-                bmpId = R.drawable.snake_turn_3;
-            else if (child.getFrame() == 5)
-                bmpId = R.drawable.snake_turn_1;
-        }
-
-        tmp = BitmapFactory.decodeResource(
-                context.getResources(),
-                bmpId);
-
-        Log.d(MainCanvas.LOG_NAME,"=============== turnBmp exit ===============");
-
-        return Bitmap.createScaledBitmap(
-                tmp, MainCanvas.rectW, MainCanvas.rectH, true);
     }
 
     private Bitmap diformationBmp(Bitmap tmp,int oldMove,int newMove)
@@ -491,45 +388,6 @@ public class Snake {
                 tmp.getHeight(), matrix,true);
     }
 
-    private void animateHead(Part head)
-    {
-        switch(parts.get(parts.size() - 2).getFrame()) {
-            case 0:
-            case 1:
-                head.setFrame(0);
-                break;
-            case 2:
-            case 5:
-                head.setFrame(1);
-                break;
-            case 3:
-            case 4:
-                head.setFrame(2);
-                break;
-        }
-    }
-
-    private void animateTail(Part tail)
-    {
-
-        switch(parts.get(1).getFrame()) {
-            case 0:
-                tail.setFrame(0);
-                break;
-            case 1:
-            case 2:
-                tail.setFrame(1);
-                break;
-            case 3:
-                tail.setFrame(2);
-                break;
-            case 4:
-            case 5:
-                tail.setFrame(3);
-
-        }
-    }
-
     public void draw(Canvas canvas)
     {
         for(int i = 0; i < getPartCount(); i++) {
@@ -539,13 +397,16 @@ public class Snake {
 
             if(isColored && p.getBmp() != null)
             {
-                canvas.drawBitmap(p.getBmp(),p.xBlock * p.wBlock,
-                        p.yBlock * p.hBlock,paint);
+                canvas.drawBitmap(p.getBmp(),x + p.xBlock * p.wBlock,
+                        y + p.yBlock * p.hBlock,paint);
             }
-            else
-                canvas.drawRect(p.xBlock * p.wBlock, p.yBlock * p.hBlock,
-                        p.xBlock * p.wBlock + p.wBlock, p.yBlock * p.hBlock + p.hBlock,
-                            paint);
+            else {
+                paint.setColor(Color.RED);
+                paint.setStyle(Paint.Style.STROKE);
+                canvas.drawRect(x + p.xBlock * p.wBlock, y + p.yBlock * p.hBlock,
+                        x + p.xBlock * p.wBlock + p.wBlock, y + p.yBlock * p.hBlock + p.hBlock,
+                        paint);
+            }
         }
     }
 }

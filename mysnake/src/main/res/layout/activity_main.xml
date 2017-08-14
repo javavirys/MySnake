@@ -4,32 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/menu_background"
     tools:context="ru.srcblog.litesoftteam.mysnake.MainActivity">
-
-    <ImageView
-        android:id="@+id/image_head"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/include"
-        android:scaleType="fitXY"
-        android:src="@drawable/head"/>
-
-    <ImageView
-        android:id="@+id/image_foot"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/foot"
-        />
 
     <include
         android:id="@+id/include"
@@ -38,60 +14,32 @@
         android:layout_height="wrap_content"/>
 
     <LinearLayout
-        android:id="@+id/body"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@+id/image_foot"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:background="@drawable/body"
         android:orientation="horizontal"
-        android:weightSum="1"
-        android:layout_below="@+id/image_head">
+        android:layout_below="@+id/include">
 
         <ru.srcblog.litesoftteam.mysnake.MainCanvas
             android:id="@+id/canvas"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.2"
+            android:visibility="visible"
             />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.8"
-            >
-
-            <TextView
-                android:id="@+id/score_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/live_name"
-                android:text="Score:"
-                android:textSize="@dimen/text_size"/>
-
-            <TextView
-                android:id="@+id/title_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:text="Snake"
-                android:textSize="18sp"/>
-
-            <TextView
-                android:id="@+id/live_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/title_name"
-                android:text="Live:"
-                android:textSize="@dimen/text_size"/>
-
-        </RelativeLayout>
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/image_foot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/foot"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
 </RelativeLayout>

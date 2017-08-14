@@ -63,34 +63,35 @@ public class MainRunnable implements Runnable {
                 main.heart.generate();
             }
 
-            //if(!gameOver)
-                //main.snake.move();
+            if(!gameOver)
+                main.snake.move();
 
             /*
                 Столкновение с серцем
              */
+
             if(main.snake.checkCollision(main.heart))
             {
                 Log.d(MainCanvas.LOG_NAME,"checkCollision");
                 main.heart.generateCoord();
 
-                Part p = new Part(main.snake.getPart(0).getXBlock(),main.snake.getPart(0).getYBlock(),
-                        main.snake.getPart(0).getWBlock(),main.snake.getPart(0).getHBlock(),
-                        main.bmpsBody);
+                int index = 1;
+                Part p = new Part(main.snake.getPart(index));
+                p.setDirection(main.snake.getPart(index).getDirection());
+                p.setVisible(false);
+                main.snake.insertPart(index,p);
 
-                main.snake.insertPart(1,p);
-
-                if(main.dListener != null)
-                    main.post(new Runnable() {
+                main.post(new Runnable() {
                         @Override
                         public void run() {
                             main.score += 1 + (2 * main.getHigh());
-                            main.dListener.onScoresChanged(main.score);
+                            if(main.dListener != null)
+                                main.dListener.onScoresChanged(main.score);
                         }
-                    });
+                });
             }
 
-            /*if(!gameOver && (main.snake.checkCollision(main.PARTS_COUNTW,true) ||
+            if(!gameOver && (main.snake.checkCollision(main.PARTS_COUNTW,true) ||
                     main.snake.checkCollision(main.PARTS_COUNTH,false) ||
                     main.snake.checkCollision(-1,true) ||
                     main.snake.checkCollision(-1,false) ||
@@ -109,7 +110,7 @@ public class MainRunnable implements Runnable {
                 if(main.lives < 1) {
                     gameOver = true;
                 }
-            }*/
+            }
 
 
             main.post(new Runnable() {

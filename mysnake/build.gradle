@@ -8,14 +8,17 @@ android {
         applicationId "ru.srcblog.litesoftteam.mysnake"
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 35
-        versionName "1.9"
+        versionCode 42
+        versionName "1.9.6"
 
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
         }
     }
 }

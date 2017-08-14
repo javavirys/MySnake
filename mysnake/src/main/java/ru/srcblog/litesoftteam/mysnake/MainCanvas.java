@@ -20,8 +20,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -37,39 +39,27 @@ public class MainCanvas extends View{
 
     public static String LOG_NAME = "MY_SNAKE";
 
-    Bitmap bmpsBody[] = { Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-            R.drawable.snake_body_1), rectW,rectH,true),
+    Bitmap bmpsBody[] = {
             Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.snake_body_2), rectW,rectH,true),
-            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.snake_body_3), rectW,rectH,true),
-            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.snake_body_4), rectW,rectH,true),
-            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.snake_body_5), rectW,rectH,true),
-            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.snake_body_6), rectW,rectH,true)};
+                    R.drawable.snake_body),rectW,rectH,true)};
 
-    Bitmap bmpsHead[] = { Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-            R.drawable.snake_head_1), rectW,rectH,true),
+    Bitmap bmpsHead[] = {
             Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.snake_head_2), rectW,rectH,true),
-            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.snake_head_3), rectW,rectH,true)};
+                    R.drawable.snake_head), rectW,rectH,true)};
 
-    Bitmap bmpsTail[] = { Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-            R.drawable.snake_tail_1), rectW,rectH,true),
+    Bitmap bmpsTail[] = {
             Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.snake_tail_2), rectW,rectH,true),
-            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.snake_tail_4), rectW,rectH,true),
-            Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.snake_tail_5), rectW,rectH,true)};
+                    R.drawable.snake_tail), rectW,rectH,true)};
 
+    Bitmap bHead = BitmapFactory.decodeResource(getResources(),R.drawable.head1);
+
+    Bitmap apple = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+            R.drawable.apple),rectW,rectH,true);
 
     DataListener dListener;
 
     private Paint paint;
+    private Paint pText;
 
     private Rect rect;
 
@@ -94,6 +84,11 @@ public class MainCanvas extends View{
 
     MotionListener motionListener;
 
+    // Начало cтартового поля
+    int x;
+    int y;
+
+
     public MainCanvas(Context context) {
         super(context);
         init();
@@ -113,6 +108,13 @@ public class MainCanvas extends View{
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5.0f);
         paint.setColor(0xff5f8878);
+
+        pText = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pText.setStyle(Paint.Style.STROKE);
+        pText.setColor(Color.RED);
+        Typeface tfFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/karate.ttf");
+        pText.setTypeface(tfFont);
+        //pText.setStrokeWidth(5.0f);
 
         rect = new Rect();
 
@@ -145,34 +147,50 @@ public class MainCanvas extends View{
         super.onSizeChanged(w, h, oldw, oldh);
         // Меняем размеры всех зависящих переменных
 
+        //w = w - w / 4;
+        h = h - (h / 4);
+
+        x = 0;
+        y = h / 4 + 40;
+
         PARTS_COUNTW = w / rectW;
         PARTS_COUNTH = h / rectH;
 
-        snake = new Snake(getContext(),w,h,PARTS_COUNTW,PARTS_COUNTH);
+        // -------------------- STATIC -------------------------
+        // head
+        bHead = Bitmap.createScaledBitmap(bHead,w,y,true);
+
+        // -------------------- GAME -------------------------
+        snake = new Snake(getContext(),x,y,w,h,PARTS_COUNTW,PARTS_COUNTH);
+        //snake.setColored(true);
         snake.setColored(true);
 
-        Part tail = new Part(0, 0, rectW, rectH, bmpsTail,Part.MOVE_RIGHT);
-        tail.setFrame(1);
+        int startX = 0;
+        int startY = PARTS_COUNTH / 2;
+
+        Part tail = new Part(startX, startY, rectW, rectH, bmpsTail,Part.MOVE_RIGHT);
+        tail.setFrame(0);
         //int arr[] = {0,1,1,2,3,3};
         //tail.setFrameSequence(arr);
         snake.addPart(tail);
 
         int k = 0;
-        for(int i = 1; i < 6; i++) {
-            Part p = new Part(i, 0, rectW, rectH, bmpsBody,Part.MOVE_RIGHT);
-            p.setFrame(Math.abs(i % 6));
+        for(int i = 1; i < 3; i++) {
+            Part p = new Part(i, startY, rectW, rectH, bmpsBody,Part.MOVE_RIGHT);
+            p.setFrame(0);
             snake.addPart(p);
             k = i;
         }
 
 
         // Head
-        Part head = new Part(++k,0,rectW,rectH,
+        Part head = new Part(++k,startY,rectW,rectH,
                 bmpsHead);
-        head.setFrame(1);
+        head.setFrame(0);
         snake.addPart(head);
 
-        heart = new Heart(rectW,rectH,PARTS_COUNTW,PARTS_COUNTH);
+        heart = new Heart(x,y,rectW,rectH,PARTS_COUNTW,PARTS_COUNTH,apple);
+        heart.setGraphics(true);
 
         Log.d(LOG_NAME,"onSizeChanged");
     }
@@ -230,21 +248,59 @@ public class MainCanvas extends View{
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        //canvas.drawARGB(255,100,255,255);
+        /*
+            Рисуем шапку
+         */
+        canvas.drawBitmap(bHead,0,0,null);
 
-        //canvas.drawBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.playing_field),0f,0f,null);
+        float dpi = getResources().getDisplayMetrics().density;
+        //Log.d(MainCanvas.LOG_NAME,"dpi: " + dpi);
+        int xLivesText = 0;
+        int yLivesText = 0;
+        int xScoreText = 0;
+        int yScoreText = 0;
+
+        if(dpi == 3.0) { //xxhdpi
+            pText.setTextSize(40);
+            xLivesText = (getWidth() / 2) / 2;
+            yLivesText = y - 120;
+            xScoreText = xLivesText;
+            yScoreText = y - 60;
+        }else if(dpi == 2.0){ // xhdpi
+            pText.setTextSize(50);
+            xLivesText = (getWidth() / 2) / 2 - 30;
+            yLivesText = y - 130;
+
+            xScoreText = xLivesText;
+            yScoreText = y - 55;
+        } else if(dpi == 1.5) //hdpi
+        {
+            pText.setTextSize(30);
+            xLivesText = (getWidth() / 2) / 2 - 30;
+            yLivesText = y - 55;
+
+            xScoreText = xLivesText;
+            yScoreText = y - 20;
+        } else if(dpi == 1.0) // mdpi
+        {
+            pText.setTextSize(40);
+            xLivesText = (getWidth() / 2) / 2 - 30;
+            yLivesText = y - 90;
+
+            xScoreText = xLivesText;
+            yScoreText = y - 35;
+        }
+
+        canvas.drawText("Lives: " + lives, xLivesText, yLivesText, pText);
+        canvas.drawText("Score: " + score, xScoreText, yScoreText, pText);
 
         /*
             Рисуем сетку
          */
 
-        //RectF r = new RectF(0,0,getWidth(),getHeight());
-
-        //canvas.drawRoundRect(r,20,20,paint);
-
         for(int i = 0; i < PARTS_COUNTW; i++)
-            for(int j = 0; j < PARTS_COUNTH;     j++){
-                rect.set(i * rectW,j * rectH,rectW + (rectW * i),rectH + (rectH * j));
+            for(int j = 0; j < PARTS_COUNTH; j++){
+                rect.set(x + i * rectW,y + j * rectH,x + rectW + (rectW * i),y + rectH + (rectH * j));
                 canvas.drawRect(rect, paint);
             }
 
@@ -257,6 +313,7 @@ public class MainCanvas extends View{
         /*
             Рисуем сердечко
          */
+        heart.animate();
         heart.draw(canvas);
     }
 

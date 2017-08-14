@@ -1,4 +1,4 @@
-/**
+/*
  Copyright 2017 javavirys
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,14 @@
 
 package ru.srcblog.litesoftteam.mysnake;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 
 import java.util.Random;
 
-/**
+/*
  * Created by javavirys on 24.06.2017.
  */
 
@@ -29,8 +31,8 @@ public class Heart {
 
     private boolean flagGen;
 
-    int x;
-    int y;
+    private int x;
+    private int y;
 
     int xBlock;
     int yBlock;
@@ -43,9 +45,17 @@ public class Heart {
 
     Paint paint;
 
+    boolean isGraphics;
+    Bitmap bmp, dstBmp;
 
-    public Heart(int wBlock,int hBlock,int blockWCount,int blockHCount)
+    boolean animate;
+    int offsetX = 0;
+    int offsetY = 0;
+
+    public Heart(int offsetX,int offsetY,int wBlock,int hBlock,int blockWCount,int blockHCount)
     {
+        this.x = offsetX;
+        this.y = offsetY;
         this.wBlock = wBlock;
         this.hBlock = hBlock;
         this.bWCount = blockWCount;
@@ -56,6 +66,13 @@ public class Heart {
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(0xff000000);
+    }
+
+    public Heart(int offsetX, int offsetY, int wBlock, int hBlock, int blockWCount, int blockHCount, Bitmap b)
+    {
+        this(offsetX,offsetY,wBlock,hBlock,blockWCount,blockHCount);
+        bmp = b;
+        dstBmp = bmp;
     }
 
 
@@ -73,6 +90,11 @@ public class Heart {
     public void generateCoord()
     {
         flagGen = false;
+    }
+
+    public void setGraphics(boolean flag)
+    {
+        isGraphics = flag;
     }
 
     public int getX() {
@@ -94,13 +116,34 @@ public class Heart {
         return yBlock;
     }
 
+    public void animate()
+    {
+        Matrix m = new Matrix();
+        if(animate) {
+            offsetX = 4;
+            offsetY = 4;
+            m.postScale(0.75f, 0.75f);
+            animate = false;
+        }
+        else {
+            offsetX = 0;
+            offsetY = 0;
+            animate = true;
+        }
+        dstBmp = Bitmap.createBitmap(bmp,0,0,bmp.getWidth(),bmp.getHeight(),m,true);
+    }
+
     public void draw(Canvas canvas)
     {
         if(flagGen)
         {
             // рисуем
             //canvas.drawRect(x,y,x + wBlock,y + hBlock,paint);
-            canvas.drawRect(xBlock * wBlock,yBlock * hBlock, (xBlock*wBlock) + wBlock, (yBlock * hBlock) + hBlock, paint);
+            if(bmp != null && isGraphics)
+                canvas.drawBitmap(dstBmp,offsetX + x + xBlock * wBlock,
+                        offsetY + y + yBlock * hBlock,null);
+            else
+                canvas.drawRect(x + xBlock * wBlock,y + yBlock * hBlock,x + (xBlock*wBlock) + wBlock,y + (yBlock * hBlock) + hBlock, paint);
         //canvas.drawCircle(50,50,20,paint);
         }
     }

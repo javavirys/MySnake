@@ -46,14 +46,51 @@ public class MotionListener{
 
         int action = motionEvent.getAction() & MotionEvent.ACTION_MASK;
 
+
         if(action == MotionEvent.ACTION_DOWN)
         {
             startX = motionEvent.getX();
             startY = motionEvent.getY();
-        }
+        } else
+        if(action == MotionEvent.ACTION_MOVE)
+        {
+            int move = context.snake.getMove();
+            if(move == Part.MOVE_UP) {
+                if (motionEvent.getX() - startX > SWIPE_MIN_DISTANCE) {
+                    context.arrow.setTranform(Part.TRANS_NONE);
+                } else if (startX - motionEvent.getX() > SWIPE_MIN_DISTANCE) {
+                    context.arrow.setTranform(Part.TRANS_ROT180);
+                }
+            } else if(move == Part.MOVE_DOWN)
+            {
+                if (motionEvent.getX() - startX > SWIPE_MIN_DISTANCE) {
+                    context.arrow.setTranform(Part.TRANS_NONE);
+                } else if (startX - motionEvent.getX() > SWIPE_MIN_DISTANCE) {
+                    context.arrow.setTranform(Part.TRANS_ROT180);
+                }
+            } else if(move == Part.MOVE_RIGHT)
+            {
+                if (motionEvent.getY() - startY > SWIPE_MIN_DISTANCE) {
+                    context.arrow.setTranform(Part.TRANS_ROT90);
+                } else if (startY - motionEvent.getY() > SWIPE_MIN_DISTANCE) {
+                    context.arrow.setTranform(Part.TRANS_ROT270);
+                }
+            } else if(move == Part.MOVE_LEFT)
+            {
+                if (motionEvent.getY() - startY > SWIPE_MIN_DISTANCE) {
+                    context.arrow.setTranform(Part.TRANS_ROT90);
+                } else if (startY - motionEvent.getY() > SWIPE_MIN_DISTANCE) {
+                    context.arrow.setTranform(Part.TRANS_ROT270);
+                }
+            }
 
+            context.arrow.setX((int)motionEvent.getX());
+            context.arrow.setY((int)motionEvent.getY());
+            context.arrow.setVisible(true);
+        } else
         if(action == MotionEvent.ACTION_UP)
         {
+            context.arrow.setVisible(false);
             endX = motionEvent.getX();
             endY = motionEvent.getY();
 

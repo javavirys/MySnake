@@ -30,6 +30,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import ru.srcblog.litesoftteam.mysnake.listeners.MotionListener;
+import ru.srcblog.litesoftteam.mysnake.menu.Arrow;
 import ru.srcblog.litesoftteam.mysnake.menu.MenuActivity;
 
 /**
@@ -63,6 +64,8 @@ public class MainCanvas extends View{
     Bitmap apple = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
             R.drawable.apple),rectW,rectH,true);
 
+    Bitmap bArrow = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+            R.drawable.arrow),50,50,true);
 
     Rect rBush[];
 
@@ -88,6 +91,10 @@ public class MainCanvas extends View{
 
     public Heart heart;
 
+    public Arrow arrow;
+
+    public Arrow arrows[];
+
     int score;
     int lives;
 
@@ -97,8 +104,10 @@ public class MainCanvas extends View{
 
     // Начало cтартового поля
     int x;
-    int y;
+    public int y;
 
+    public boolean showingMsg;
+    public String msg;
 
     public MainCanvas(Context context) {
         super(context);
@@ -137,6 +146,8 @@ public class MainCanvas extends View{
         motionListener = new MotionListener(this);
 
         runnable = new MainRunnable(this);
+        runnable.isTimerShow = true;
+
         mThread = new Thread(runnable);
         mThread.start();
 
@@ -189,6 +200,15 @@ public class MainCanvas extends View{
 
         rBush = tmp;
 
+        arrow = new Arrow(bArrow);
+
+        arrows = new Arrow[2];
+
+        for (int i = 0; i < arrows.length; i ++) {
+            arrows[i] = new Arrow(bArrow);
+            arrows[i].setVisible(false);
+        }
+
         // -------------------- GAME -------------------------
         snake = new Snake(getContext(),x,y,w,h,PARTS_COUNTW,PARTS_COUNTH);
         snake.setColored(true);
@@ -218,7 +238,7 @@ public class MainCanvas extends View{
         heart = new Heart(x,y,rectW,rectH,PARTS_COUNTW,PARTS_COUNTH,apple);
         heart.setGraphics(true);
 
-        Log.d(LOG_NAME,"onSizeChanged");
+        //Log.d(LOG_NAME,"onSizeChanged");
     }
 
 
@@ -273,7 +293,6 @@ public class MainCanvas extends View{
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
 
         /*
             Рисуем фон
@@ -339,6 +358,19 @@ public class MainCanvas extends View{
          */
         heart.animate();
         heart.draw(canvas);
+
+        arrow.onDraw(canvas);
+
+        for(int i = 0; i < arrows.length; i ++)
+            arrows[i].onDraw(canvas);
+
+        if(showingMsg && msg != null)
+        {
+            Paint p = new Paint(pText);
+            p.setTextSize(40);
+            canvas.drawText(msg,(getWidth() - pText.measureText(msg)) / 2, getHeight() / 2,p);
+        }
+
     }
 
     public void stop()

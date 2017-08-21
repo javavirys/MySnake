@@ -27,7 +27,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".menu.ScoresActivity">
+        <activity android:name=".menu.ScoresActivity"
+                  android:screenOrientation="portrait">
         </activity>
 
         <activity

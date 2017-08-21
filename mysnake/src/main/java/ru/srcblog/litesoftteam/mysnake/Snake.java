@@ -23,6 +23,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -52,6 +53,8 @@ public class Snake {
     boolean isColored;
 
     ArrayList<Turn> turnsList;
+
+    boolean addBodyFlag = false;
 
     public Snake(Context c,int x,int y,int w,int h,int countBlockW,int countBlockH)
     {
@@ -139,8 +142,8 @@ public class Snake {
                 move = Part.MOVE_LEFT;
                 break;
         }
-        p.setDirection(move);
-
+        //p.setDirection(move);
+        p.setDir(move);
         Turn t = new Turn();
         t.x = p.getXBlock();
         t.y = p.getYBlock();
@@ -167,7 +170,8 @@ public class Snake {
                 move = Part.MOVE_RIGHT;
                 break;
         }
-        p.setDirection(move);
+        //p.setDirection(move);
+        p.setDir(move);
         Turn t = new Turn();
         t.x = p.getXBlock();
         t.y = p.getYBlock();
@@ -238,7 +242,7 @@ public class Snake {
 
     public void move()
     {
-        Part head = parts.get(parts.size() - 1);
+        Part head = getHead();
 
         Part oldPart = null;
 
@@ -263,6 +267,16 @@ public class Snake {
             oldPart = new Part(head);
             head.yBlock --;
         }
+
+        head.setDirection(head.getDirection());
+
+        //===================== Add body part ========================
+        if (addBodyFlag) {
+            addBodyPart(oldPart);
+            return;
+        }
+        //===================== end of Added body part ========================
+
         if(oldPart == null)
             return;
 
@@ -270,77 +284,74 @@ public class Snake {
         int xBlock;
         int yBlock;
         int move;
-        //Bitmap swapBmp;
 
         // Запускаем цикл в котором каждый квадратик принимает
         // старые координаты предыдущего квадратика
         for(int i = parts.size() - 2; i > -1; i--) {
             Part p = parts.get(i);
-            // animate
-            //p.nextFrame();
-            // end of animate
 
             xBlock = p.xBlock;
             yBlock = p.yBlock;
             move = p.getDirection();
 
-            //swapBmp = p.getSwapBmp() == null ? null : Bitmap.createBitmap(p.getSwapBmp()); // test
+            // TODO test
+            p.oldX = xBlock;
+            p.oldY = yBlock;
+            p.oldDir = move;
 
             p.xBlock = oldPart.xBlock;
             p.yBlock = oldPart.yBlock;
             p.setDirection(oldPart.getDirection()); //
-            p.setVisible(true);
+
+            for(int j = 0; j < turnsList.size(); j ++) {
+                Turn t = turnsList.get(j);
+
+                // Текущая часть попала в один из поворотов
+                if (t.x == p.getXBlock() && t.y == p.getYBlock()) {
+                    //Log.d(MainCanvas.LOG_NAME,"turn: getDirection: " + p.getDirection() + " move:" + move);
+
+                    // Если прошлый квадрат не видим, то показываем его
+                    Part parent = parts.get(i + 1);
+                    if (parent.getSwapBmp() != null) {
+                        Turn tmpTurn = null;
+                        // Если следующий поворот существует
+                        if (j + 1 < turnsList.size())
+                            tmpTurn = turnsList.get(j + 1);
+                        // Если следующая клетка это не поворот
+                        // то меняем изгиб на линию
+                        if (tmpTurn == null ||
+                                !(tmpTurn.x == parent.getXBlock() &&
+                                        tmpTurn.y == parent.getYBlock()))
+                            parent.setSwapBmp(null);
+                    }
+                    // ************************************************
+                }
+            }
 
             // ***************** Поворот ***************** \\
             if(p.getDirection() != move)
             {
-                //Log.d(MainCanvas.LOG_NAME,"Direction is changed");
-                //Log.d(MainCanvas.LOG_NAME,"turn count:" + turnsList.size());
-                for(int j = 0; j < turnsList.size(); j ++)
+                if (i > 0)
                 {
-                    Turn t = turnsList.get(j);
+                    Bitmap tmp;
 
-                    // Текущая часть попала в один из поворотов
-                    if(t.x == p.getXBlock() && t.y == p.getYBlock()) {
-                        //Log.d(MainCanvas.LOG_NAME,"turn: getDirection: " + p.getDirection() + " move:" + move);
+                    // TODO Подогнать под изгибы
 
-                        // Если прошлый квадрат не видим, то показываем его
-                        Part parent = parts.get(i + 1);
-                        if (parent.getSwapBmp() != null) {
-                            Turn tmpTurn = null;
-                            // Если следующий поворот существует
-                            if(j + 1 < turnsList.size())
-                                tmpTurn = turnsList.get(j + 1);
-                            // Если следующая клетка это не поворот
-                            // то меняем изгиб на линию
-                            if(tmpTurn == null ||
-                                    !(tmpTurn.x == parent.getXBlock() &&
-                                            tmpTurn.y == parent.getYBlock()))
-                                parent.setSwapBmp(null);
-                        }
-                        // ************************************************
+                    tmp = BitmapFactory.decodeResource(
+                            context.getResources(),
+                            R.drawable.snake_around);
 
-                        if (i > 0)
-                        {
-                            Bitmap tmp;
+                    tmp = Bitmap.createScaledBitmap(
+                            tmp, MainCanvas.rectW, MainCanvas.rectH, true);
 
-                            // TODO Подогнать под изгибы
+                    tmp = diformationBmp(tmp,move,p.getDirection());
+                    p.setSwapBmp(tmp);
 
-                            tmp = BitmapFactory.decodeResource(
-                                    context.getResources(),
-                                    R.drawable.snake_around);
-
-                            tmp = Bitmap.createScaledBitmap(
-                                    tmp, MainCanvas.rectW, MainCanvas.rectH, true);
-
-                            tmp = diformationBmp(tmp,move,p.getDirection());
-                            p.setSwapBmp(tmp);
-
-                        }else if(i == 0)
-                            if(turnsList.size() > 0)
-                                turnsList.remove(0);
-                    }
+                }else if(i == 0) {
+                    if (turnsList.size() > 0)
+                        turnsList.remove(0);
                 }
+
             }
             // ***************** Конец поворота ***************** \\
 
@@ -348,13 +359,40 @@ public class Snake {
             oldPart.xBlock = xBlock;
             oldPart.yBlock = yBlock;
             oldPart.setDirection(move);
-            //oldPart.setSwapBmp(swapBmp);// test
         }
 
 
     }
 
-    private Bitmap diformationBmp(Bitmap tmp,int oldMove,int newMove)
+    private void addBodyPart(Part old)
+    {
+        //===================== Add body part ========================
+        Log.d(MainCanvas.LOG_NAME, "added");
+        Part tail = old;
+        //Log.d(MainCanvas.LOG_NAME, "old tail: " + tail.getDirection());
+        Part addPart = new Part(tail);
+        addPart.setBitmaps(getPart(1).getBitmaps());
+        addPart.setDirection(tail.getDirection());
+
+        if (addPart.getDirection() != getPart(getPartCount() - 2).getDirection()) {
+                Log.d(MainCanvas.LOG_NAME, "turn");
+                Bitmap tmp = BitmapFactory.decodeResource(
+                        context.getResources(),
+                        R.drawable.snake_around);
+
+                tmp = Bitmap.createScaledBitmap(
+                        tmp, MainCanvas.rectW, MainCanvas.rectH, true);
+
+                tmp = diformationBmp(tmp, getPart(getPartCount() - 2).getDirection(), addPart.getDirection());
+            addPart.setSwapBmp(tmp);
+        }
+
+        insertPart(getPartCount() - 1, addPart);
+        addBodyFlag = false;
+        //===================== end of Added body part ========================
+    }
+
+    public Bitmap diformationBmp(Bitmap tmp,int oldMove,int newMove)
     {
         Matrix matrix = new Matrix();
         if(oldMove == Part.MOVE_RIGHT && newMove == Part.MOVE_UP) {
@@ -388,6 +426,11 @@ public class Snake {
                 tmp.getHeight(), matrix,true);
     }
 
+    public void addPart()
+    {
+        addBodyFlag = true;
+    }
+
     public void draw(Canvas canvas)
     {
         for(int i = 0; i < getPartCount(); i++) {
@@ -395,7 +438,7 @@ public class Snake {
             if(!p.isVisible())
                 continue;
 
-            if(isColored && p.getBmp() != null)
+            if(isColored && p.getBmp() != null && p.isVisible())
             {
                 canvas.drawBitmap(p.getBmp(),x + p.xBlock * p.wBlock,
                         y + p.yBlock * p.hBlock,paint);

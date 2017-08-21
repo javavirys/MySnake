@@ -30,6 +30,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import ru.srcblog.litesoftteam.mysnake.listeners.MotionListener;
+import ru.srcblog.litesoftteam.mysnake.menu.MenuActivity;
 
 /**
  * Created by javavirys on 21.06.2017.
@@ -51,15 +52,25 @@ public class MainCanvas extends View{
             Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
                     R.drawable.snake_tail), rectW,rectH,true)};
 
-    Bitmap bHead = BitmapFactory.decodeResource(getResources(),R.drawable.head1);
+    Bitmap bHeadBoard = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.board),204,110,true);
+
+    Bitmap bHeadBush = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.bush),119,80,true);
+
+    Bitmap bFootFence = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.fence),53,100,true);
+
+    Bitmap bFootBush = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.foot_bush),240,115,true);
 
     Bitmap apple = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
             R.drawable.apple),rectW,rectH,true);
+
+
+    Rect rBush[];
 
     DataListener dListener;
 
     private Paint paint;
     private Paint pText;
+    private Paint pGrid;
 
     private Rect rect;
 
@@ -109,6 +120,11 @@ public class MainCanvas extends View{
         paint.setStrokeWidth(5.0f);
         paint.setColor(0xff5f8878);
 
+        pGrid = new Paint(Paint.ANTI_ALIAS_FLAG);
+        pGrid.setStyle(Paint.Style.STROKE);
+        pGrid.setStrokeWidth(1.0f);
+        pGrid.setColor(0x885f8878);
+
         pText = new Paint(Paint.ANTI_ALIAS_FLAG);
         pText.setStyle(Paint.Style.STROKE);
         pText.setColor(Color.RED);
@@ -148,21 +164,33 @@ public class MainCanvas extends View{
         // Меняем размеры всех зависящих переменных
 
         //w = w - w / 4;
-        h = h - (h / 4);
+        h = h - 240;
 
         x = 0;
-        y = h / 4 + 40;
+        y = 120;
 
         PARTS_COUNTW = w / rectW;
         PARTS_COUNTH = h / rectH;
 
         // -------------------- STATIC -------------------------
-        // head
-        bHead = Bitmap.createScaledBitmap(bHead,w,y,true);
+
+        // Координаты верхних кустов
+        Rect tmp[] = {
+                new Rect(bHeadBoard.getWidth() - (bHeadBush.getWidth() / 2),0,0,0),
+                new Rect(bHeadBoard.getWidth() - (bHeadBush.getWidth() / 2), bHeadBush.getHeight() / 2,0,0),
+                new Rect(0,0,0,0),
+                new Rect(bHeadBoard.getWidth() / 2,-10,0,0),
+                new Rect(getWidth() / 2,0,0,0),
+                new Rect(getWidth() / 2 + getWidth() / 4,0,0,0),
+                new Rect(getWidth() / 2 + (getWidth() / 4 * 2),0,0,0),
+                new Rect(getWidth() / 2 + (getWidth() / 6),bHeadBush.getHeight() / 2,0,0),
+                new Rect(getWidth() - bHeadBush.getWidth() + 10,bHeadBush.getHeight() / 2,0,0)
+        };
+
+        rBush = tmp;
 
         // -------------------- GAME -------------------------
         snake = new Snake(getContext(),x,y,w,h,PARTS_COUNTW,PARTS_COUNTH);
-        //snake.setColored(true);
         snake.setColored(true);
 
         int startX = 0;
@@ -170,8 +198,6 @@ public class MainCanvas extends View{
 
         Part tail = new Part(startX, startY, rectW, rectH, bmpsTail,Part.MOVE_RIGHT);
         tail.setFrame(0);
-        //int arr[] = {0,1,1,2,3,3};
-        //tail.setFrameSequence(arr);
         snake.addPart(tail);
 
         int k = 0;
@@ -248,51 +274,50 @@ public class MainCanvas extends View{
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+
+        /*
+            Рисуем фон
+         */
+
+        MenuActivity.fillBackground(getContext(),this,getWidth(),getHeight());
+
         /*
             Рисуем шапку
          */
-        canvas.drawBitmap(bHead,0,0,null);
 
-        float dpi = getResources().getDisplayMetrics().density;
-        //Log.d(MainCanvas.LOG_NAME,"dpi: " + dpi);
-        int xLivesText = 0;
-        int yLivesText = 0;
-        int xScoreText = 0;
-        int yScoreText = 0;
+        canvas.drawBitmap(bHeadBoard,0,0,null);
 
-        if(dpi == 3.0) { //xxhdpi
-            pText.setTextSize(40);
-            xLivesText = (getWidth() / 2) / 2;
-            yLivesText = y - 120;
-            xScoreText = xLivesText;
-            yScoreText = y - 60;
-        }else if(dpi == 2.0){ // xhdpi
-            pText.setTextSize(50);
-            xLivesText = (getWidth() / 2) / 2 - 30;
-            yLivesText = y - 130;
+        // Рисуем на доске счет и жизни
 
-            xScoreText = xLivesText;
-            yScoreText = y - 55;
-        } else if(dpi == 1.5) //hdpi
-        {
-            pText.setTextSize(30);
-            xLivesText = (getWidth() / 2) / 2 - 30;
-            yLivesText = y - 55;
+        pText.setTextSize(20);
 
-            xScoreText = xLivesText;
-            yScoreText = y - 20;
-        } else if(dpi == 1.0) // mdpi
-        {
-            pText.setTextSize(40);
-            xLivesText = (getWidth() / 2) / 2 - 30;
-            yLivesText = y - 90;
+        String str = "Lives: " + lives;
 
-            xScoreText = xLivesText;
-            yScoreText = y - 35;
-        }
+        int startTextX = (int) ((bHeadBoard.getWidth() - pText.measureText(str)) / 2);
 
-        canvas.drawText("Lives: " + lives, xLivesText, yLivesText, pText);
-        canvas.drawText("Score: " + score, xScoreText, yScoreText, pText);
+        int startTextY = (bHeadBoard.getHeight() / 2) + (int)pText.getTextSize();
+
+        canvas.drawText(str, startTextX,startTextY,pText);
+
+        str = "Score: " + score;
+
+        startTextY = bHeadBoard.getHeight() / 4 + (bHeadBoard.getHeight() / 2) + (int)pText.getTextSize();
+
+        canvas.drawText(str, startTextX, startTextY, pText);
+
+        // Рисуем кустики
+
+        for(Rect r : rBush)
+            canvas.drawBitmap(bHeadBush,r.left,r.top,null);
+
+        // Рисуем низ
+
+        for(int i = 0; i < getWidth() / (bFootBush.getWidth() / 2); i++)
+            canvas.drawBitmap(bFootBush,i * (bFootBush.getWidth() / 2) - (bFootBush.getWidth() / 4),
+                    getHeight() - bFootBush.getHeight(),null); // кусты
+
+        for(int i = 0; i < (getWidth() / bFootFence.getWidth()) +1; i ++)
+            canvas.drawBitmap(bFootFence,i * bFootFence.getWidth(),getHeight() - bFootFence.getHeight(),null); // Забор
 
         /*
             Рисуем сетку
@@ -301,14 +326,13 @@ public class MainCanvas extends View{
         for(int i = 0; i < PARTS_COUNTW; i++)
             for(int j = 0; j < PARTS_COUNTH; j++){
                 rect.set(x + i * rectW,y + j * rectH,x + rectW + (rectW * i),y + rectH + (rectH * j));
-                canvas.drawRect(rect, paint);
+                canvas.drawRect(rect, pGrid);
             }
 
         /*
             Рисуем змейку
          */
         snake.draw(canvas);
-
 
         /*
             Рисуем сердечко

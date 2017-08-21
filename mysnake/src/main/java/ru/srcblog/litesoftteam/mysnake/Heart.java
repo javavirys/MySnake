@@ -52,6 +52,8 @@ public class Heart {
     int offsetX = 0;
     int offsetY = 0;
 
+    long curTime; // нужно для сравниения по времение
+
     public Heart(int offsetX,int offsetY,int wBlock,int hBlock,int blockWCount,int blockHCount)
     {
         this.x = offsetX;
@@ -118,6 +120,11 @@ public class Heart {
 
     public void animate()
     {
+        if(System.currentTimeMillis() - curTime < 1000L)
+            return;
+        else
+            curTime = System.currentTimeMillis();
+
         Matrix m = new Matrix();
         if(animate) {
             offsetX = 4;

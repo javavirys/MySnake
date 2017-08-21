@@ -2,37 +2,86 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/menu_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/menu_background"
     tools:context="ru.srcblog.litesoftteam.mysnake.menu.MenuActivity">
 
-    <ImageView
+    <TextView
         android:id="@+id/menu_head"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitCenter"
-        android:src="@drawable/menu_header"/>
-
-    <ImageView
-        android:id="@+id/menu_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/menu_footer"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/menu_body"
-        android:layout_below="@+id/menu_head"/>
+        android:layout_height="80dp"
+        android:gravity="center"
+        android:text="Snake 3"
+        android:textColor="@color/menu_title"
+        android:textSize="45sp"
+        android:textStyle="bold|italic"/>
 
     <ImageView
         android:id="@+id/menu_footer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitXY"
-        android:src="@drawable/menu_footer"
+        android:layout_height="80dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
+        android:layout_alignParentStart="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/menu_footer"/>
+
+    <LinearLayout
+        android:id="@+id/layout_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/menu_footer"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/menu_head"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/menu_layout_up"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:orientation="horizontal">
+
+            <ru.srcblog.litesoftteam.mysnake.menu.MyImageButton
+                android:id="@+id/button_new_game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:src="@drawable/new_game"/>
+
+            <ru.srcblog.litesoftteam.mysnake.menu.MyImageButton
+                android:id="@+id/button_scores"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:src="@drawable/scores"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menu_layout_down"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:orientation="horizontal">
+
+            <ru.srcblog.litesoftteam.mysnake.menu.MyImageButton
+                android:id="@+id/button_about"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:src="@drawable/about"/>
+
+            <ru.srcblog.litesoftteam.mysnake.menu.MyImageButton
+                android:id="@+id/button_exit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:src="@drawable/exit"/>
+
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -75,11 +75,7 @@ public class MainRunnable implements Runnable {
                 Log.d(MainCanvas.LOG_NAME,"checkCollision");
                 main.heart.generateCoord();
 
-                int index = 1;
-                Part p = new Part(main.snake.getPart(index));
-                p.setDirection(main.snake.getPart(index).getDirection());
-                p.setVisible(false);
-                main.snake.insertPart(index,p);
+                main.snake.addPart();
 
                 main.post(new Runnable() {
                         @Override

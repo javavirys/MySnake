@@ -8,8 +8,8 @@ android {
         applicationId "ru.srcblog.litesoftteam.mysnake"
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 42
-        versionName "1.9.6"
+        versionCode 61
+        versionName "2.0.1"
 
     }
     buildTypes {

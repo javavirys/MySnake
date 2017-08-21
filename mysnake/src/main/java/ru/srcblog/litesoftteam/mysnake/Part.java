@@ -82,6 +82,12 @@ public class Part {
 
     Bitmap swapBmp = null;
 
+    boolean deletedFlag;
+
+    public int oldX;
+    public int oldY;
+    public int oldDir;
+
     public Part(int xBlock, int yBlock, int wBlock, int hBlock, Bitmap bitmaps[],int direction)
     {
         isVisible = true;
@@ -133,6 +139,11 @@ public class Part {
 
     public boolean isVisible() {
         return isVisible;
+    }
+
+    public boolean isDeleted()
+    {
+        return deletedFlag;
     }
 
     public int getFrame() {
@@ -292,6 +303,11 @@ public class Part {
         frameIndex = index;
     }
 
+    public void setDir(int dir)
+    {
+        direction = dir;
+    }
+
     public void setDirection(int dir)
     {
         direction = dir;
@@ -330,6 +346,11 @@ public class Part {
     public void setSwapBmp(Bitmap bmp)
     {
         swapBmp = bmp;
+    }
+
+    public void setDeletedFlag(boolean flag)
+    {
+        deletedFlag = flag;
     }
 
     public void resetTransformBmp() {

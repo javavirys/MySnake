@@ -4,22 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/menu_background"
     tools:context="ru.srcblog.litesoftteam.mysnake.MainActivity">
 
     <include
         android:id="@+id/include"
         layout="@layout/layout_actionbar"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/image_foot"
         android:layout_alignParentLeft="true"
-        android:orientation="horizontal"
-        android:layout_below="@+id/include">
+        android:layout_below="@+id/include"
+        android:orientation="horizontal">
 
         <ru.srcblog.litesoftteam.mysnake.MainCanvas
             android:id="@+id/canvas"
@@ -29,17 +28,5 @@
             />
 
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/image_foot"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/foot"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
 
 </RelativeLayout>

@@ -38,6 +38,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CheckBox;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -192,9 +193,12 @@ public class MenuActivity extends Activity implements Animation.AnimationListene
             public void onClick(View view) {
                 d.dismiss();
                 Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                SeekBar bar = d.findViewById(R.id.seek_high_level);
 
+                SeekBar bar = d.findViewById(R.id.seek_high_level);
                 i.putExtra(MainActivity.INTENT_MSG_DIFFICULTY, bar.getProgress());
+
+                CheckBox check = d.findViewById(R.id.check_graphics);
+                i.putExtra(MainActivity.INTENT_MSG_GRAPHICS,check.isChecked());
                 startActivity(i);
             }
         });

@@ -100,6 +100,8 @@ public class MainCanvas extends View{
 
     int speed;
 
+    boolean graphics = true;
+
     MotionListener motionListener;
 
     // Начало cтартового поля
@@ -211,7 +213,7 @@ public class MainCanvas extends View{
 
         // -------------------- GAME -------------------------
         snake = new Snake(getContext(),x,y,w,h,PARTS_COUNTW,PARTS_COUNTH);
-        snake.setColored(true);
+        snake.setColored(graphics);
 
         int startX = 0;
         int startY = PARTS_COUNTH / 2;
@@ -236,7 +238,7 @@ public class MainCanvas extends View{
         snake.addPart(head);
 
         heart = new Heart(x,y,rectW,rectH,PARTS_COUNTW,PARTS_COUNTH,apple);
-        heart.setGraphics(true);
+        heart.setGraphics(graphics);
 
         //Log.d(LOG_NAME,"onSizeChanged");
     }
@@ -406,6 +408,11 @@ public class MainCanvas extends View{
     public void setHigh(int speed)
     {
         this.speed = speed;
+    }
+
+    public void setGraphics(boolean flag)
+    {
+        graphics = flag;
     }
 
 }

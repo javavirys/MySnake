@@ -446,9 +446,16 @@ public class Snake {
             else {
                 paint.setColor(Color.RED);
                 paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(1);
                 canvas.drawRect(x + p.xBlock * p.wBlock, y + p.yBlock * p.hBlock,
                         x + p.xBlock * p.wBlock + p.wBlock, y + p.yBlock * p.hBlock + p.hBlock,
                         paint);
+
+                for(int j = 0; j < p.wBlock / 4; j = j + 2) {
+                    canvas.drawRect((x + p.xBlock * p.wBlock) + j, (y + p.yBlock * p.hBlock) + j,
+                            (x + p.xBlock * p.wBlock + p.wBlock) - j - 1, (y + p.yBlock * p.hBlock + p.hBlock) - j - 1,
+                            paint);
+                }
             }
         }
     }

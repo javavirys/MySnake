@@ -29,6 +29,7 @@ import ru.srcblog.litesoftteam.mysnake.menu.ScoresActivity;
 public class MainActivity extends Activity {
 
     public static String INTENT_MSG_DIFFICULTY = "Difficulty";
+    public static String INTENT_MSG_GRAPHICS = "Graphics";
 
     MainActivity main;
 
@@ -44,6 +45,7 @@ public class MainActivity extends Activity {
         Intent iMsg = getIntent();
         if(iMsg != null) {
             canvas.setHigh(iMsg.getIntExtra(INTENT_MSG_DIFFICULTY, 0));
+            canvas.setGraphics(iMsg.getBooleanExtra(INTENT_MSG_GRAPHICS, true));
         }
 
         canvas.setLives(3);

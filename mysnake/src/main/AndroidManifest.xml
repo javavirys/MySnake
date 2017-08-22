@@ -11,15 +11,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
 
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".menu.MenuActivity"
+        <activity
+            android:name=".menu.MenuActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".menu.ScoresActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
+        <activity android:name=".menu.SplashActivity"
                   android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -27,14 +38,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".menu.ScoresActivity"
-                  android:screenOrientation="portrait">
-        </activity>
-
-        <activity
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:name="com.google.android.gms.ads.AdActivity" />
-
     </application>
 
 </manifest>

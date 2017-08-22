@@ -42,6 +42,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -95,17 +96,17 @@ public class MenuActivity extends Activity implements Animation.AnimationListene
                 mInterstitialAd.show();
             }
 
-            /*@Override
+            @Override
             public void onAdFailedToLoad(int errorCode) {
                 // Code to be executed when an ad request fails.
                 Log.i(MainCanvas.LOG_NAME,"onAdFailed: " + errorCode);
-            }*/
+            }
                                       });
 
-        //AdRequest adRequest = new AdRequest.Builder()//.addTestDevice("8C42340767A25C05F0527E18EC82509B")
-                //.build();
+        AdRequest adRequest = new AdRequest.Builder()//.addTestDevice("8C42340767A25C05F0527E18EC82509B")
+                .build();
 
-        //mInterstitialAd.loadAd(adRequest);
+        mInterstitialAd.loadAd(adRequest);
 
         font = Typeface.createFromAsset(getAssets(), "fonts/karate.ttf");
 
@@ -117,6 +118,13 @@ public class MenuActivity extends Activity implements Animation.AnimationListene
 
         fillFoot();// Заполняем низ
 
+    }
+
+
+    @Override
+    public void onBackPressed()
+    {
+        finish();
     }
 
     public static void fillBackground(Context context, View v, int width, int height)
